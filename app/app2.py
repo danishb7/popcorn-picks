@@ -102,25 +102,43 @@ def main():
     movies_df, ratings_df, survey_data = load_data()
     model = load_model()
     
-    # User input for personalized recommendations
-    user_id = st.number_input("Enter User ID", 
-                              min_value=1, 
-                              max_value=ratings_df['userId'].max(), 
-                              value=1)
+    ### User can be fixed or random from swithcing the options below
+    # # User input for personalized recommendations
+    # user_id = st.number_input("Enter User ID", 
+    #                           min_value=1, 
+    #                           max_value=ratings_df['userId'].max(), 
+    #                           value=1)
+    
 
-    if st.button("Get Recommendations"):
-        with st.spinner('Generating recommendations...'):
-            recommendations = hybrid_recommend(
-                user_id=user_id,
-                model=model,
-                ratings_df=ratings_df,
-                movies_df=movies_df,
-                survey_df=survey_data,
-                n=5
-            )
-        st.success("Top Recommendations:")
-        for movie in recommendations:
-            st.write(f"- {movie}")
+    # if st.button("Get Recommendations"):
+    #     with st.spinner('Generating recommendations...'):
+    #         recommendations = hybrid_recommend(
+    #             user_id=user_id,
+    #             model=model,
+    #             ratings_df=ratings_df,
+    #             movies_df=movies_df,
+    #             survey_df=survey_data,
+    #             n=5
+    #         )
+    #     st.success("Top Recommendations:")
+    #     for movie in recommendations:
+    #         st.write(f"- {movie}")
+
+    default_user_id = 1  # Set a fixed user ID for recommendations
+    st.write(f"Recommendations for User ID: {default_user_id}")
+
+    with st.spinner('Generating recommendations...'):
+        recommendations = hybrid_recommend(
+            user_id=default_user_id,
+            model=model,
+            ratings_df=ratings_df,
+            movies_df=movies_df,
+            survey_df=survey_data,
+            n=5
+        )
+    st.success("Top Recommendations:")
+    for movie in recommendations:
+        st.write(f"- {movie}")
 
     # Render filters
     render_filters()
