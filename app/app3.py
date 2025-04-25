@@ -77,16 +77,7 @@ def main():
     movies_df, ratings_df, survey_data = load_data()
     model = load_model()
 
-    # Render filters and apply them to the movies dataset
-    filtered_movies = render_filters_and_apply(movies_df)
-
-    # Render filtered movie cards with a limit
-    render_movie_cards(filtered_movies, limit=10)
-
-    # Render carousel for recently released movies
-    render_carousel()
-
-    # Hybrid Recommendation Section
+    # --- Move Personalized Recommendations to the Top ---
     st.subheader("🔍 Personalized Recommendations")
     default_user_id = 1  # Set a fixed user ID for recommendations
     st.write(f"Recommendations for User ID: {default_user_id}")
@@ -103,6 +94,16 @@ def main():
     st.success("Top Recommendations:")
     for movie in recommendations:
         st.write(f"- {movie}")
+    # -----------------------------------------------------
+
+    # Render filters and apply them to the movies dataset
+    filtered_movies = render_filters_and_apply(movies_df)
+
+    # Render filtered movie cards
+    render_movie_cards(filtered_movies, limit=10)
+
+    # Render carousel for recently released movies
+    render_carousel()
 
 if __name__ == "__main__":
     main()
