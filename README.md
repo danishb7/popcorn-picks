@@ -13,7 +13,6 @@ Popcorn Picks is an interactive movie recommendation system designed to deliver 
 6. [How It Works](#how-it-works)
 7. [Usage](#usage)
 8. [Contributing](#contributing)
-9. [License](#license)
 
 ---
 
