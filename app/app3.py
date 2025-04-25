@@ -3,7 +3,7 @@ import pandas as pd
 from utils3 import load_data, load_model, hybrid_recommend
 from carousel import render_carousel  # Import the carousel function
 
-# Custom CSS for styling
+# Custom CSS for styling (minimal for list view)
 def add_custom_css():
     st.markdown(
         """
@@ -13,26 +13,57 @@ def add_custom_css():
             color: #fff;
         }
         .movie-card {
-            margin: 10px;
+            margin-bottom: 15px;
             padding: 10px;
             border: 1px solid #ccc;
-            border-radius: 10px;
-            text-align: center;
-            transition: transform 0.2s ease-in-out;
+            border-radius: 8px;
+            background: #2c2f33;
+            color: #fff;
+            text-align: left;
         }
         .movie-card img {
-            width: 100%;
+            float: left;
+            margin-right: 15px;
+            width: 80px;
+            height: 120px;
             border-radius: 5px;
         }
-        .movie-card:hover {
-            transform: scale(1.05);
+        .movie-card h4 {
+            margin: 0;
+            font-size: 18px;
+        }
+        .movie-card p {
+            margin: 5px 0;
+            font-size: 14px;
+            color: #aaa;
         }
         </style>
         """,
         unsafe_allow_html=True
     )
 
-# Filter movies based on dropdown and sliders
+def render_recommendations_list(recommendations):
+    """
+    Render recommendations in a vertical list view.
+    """
+    st.subheader("🎥 Personalized Recommendations")
+
+    default_poster = "https://via.placeholder.com/80x120"
+    for movie in recommendations:
+        st.markdown(
+            f"""
+            <div class="movie-card">
+                <img src="{default_poster}" alt="{movie} Poster">
+                <div>
+                    <h4>{movie}</h4>
+                    <p>⭐ Rating: 4.5</p>
+                    <p>Genre: Action, Adventure</p>
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
 def render_filters_and_apply(movies_df):
     st.subheader("🔍 Filter Movies")
     
@@ -43,12 +74,11 @@ def render_filters_and_apply(movies_df):
     # Apply filters
     filtered_movies = movies_df.copy()
     if genre != "All":
-        filtered_movies = filtered_movies[filtered_movies["genres"].apply(lambda x: genre in x)]
-    filtered_movies = filtered_movies[filtered_movies["avg_rating"] >= min_rating]
+        filtered_movies = filtered_movies[movies_df["genres"].apply(lambda x: genre in x)]
+    filtered_movies = filtered_movies[movies_df["avg_rating"] >= min_rating]
 
     return filtered_movies
 
-# Render movie cards dynamically based on the filtered dataset
 def render_movie_cards(movies_df, limit=10):
     st.subheader("🎬 Movie Recommendations")
     st.markdown('<div style="display: flex; flex-wrap: wrap; justify-content: center;">', unsafe_allow_html=True)
@@ -77,11 +107,8 @@ def main():
     movies_df, ratings_df, survey_data = load_data()
     model = load_model()
 
-    # --- Move Personalized Recommendations to the Top ---
-    st.subheader("🔍 Personalized Recommendations")
+    # --- Render Personalized Recommendations ---
     default_user_id = 1  # Set a fixed user ID for recommendations
-    st.write(f"Recommendations for User ID: {default_user_id}")
-
     with st.spinner('Generating recommendations...'):
         recommendations = hybrid_recommend(
             user_id=default_user_id,
@@ -91,9 +118,7 @@ def main():
             survey_df=survey_data,
             n=5
         )
-    st.success("Top Recommendations:")
-    for movie in recommendations:
-        st.write(f"- {movie}")
+    render_recommendations_list(recommendations)
     # -----------------------------------------------------
 
     # Render filters and apply them to the movies dataset

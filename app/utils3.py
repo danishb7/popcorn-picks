@@ -5,6 +5,14 @@ import streamlit as st
 
 @st.cache_data
 def load_data():
+    """
+    Load movie, ratings, and survey data from CSV files.
+
+    Returns:
+        movies (DataFrame): Movie details with genres and average ratings.
+        ratings (DataFrame): User ratings for movies.
+        survey_data (DataFrame): Survey data for hybrid recommendations.
+    """
     # File paths
     movies_path = "datasets/ml-25m/movies.csv"
     ratings_path = "datasets/ml-25m/ratings.csv"
@@ -35,8 +43,18 @@ def load_data():
 
 @st.cache_resource
 def load_model():
-    # Load the recommendation model
-    with open("model.pkl", "rb") as f:
+    """
+    Load the recommendation model from a serialized pickle file.
+
+    Returns:
+        model (object): The pre-trained recommendation model.
+    """
+    # Path to the model file
+    model_path = "model.pkl"
+    assert os.path.exists(model_path), f"Model file not found: {model_path}"
+    
+    # Load the model
+    with open(model_path, "rb") as f:
         return pickle.load(f)
 
 def hybrid_recommend(user_id, model, ratings_df, movies_df, survey_df, n=5):
