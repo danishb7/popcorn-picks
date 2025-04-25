@@ -23,10 +23,6 @@ def load_data():
     # Preprocess genres into lists
     movies['genres'] = movies['genres'].str.split('|')
     
-    # Extract release year from title
-    movies["release_year"] = movies["title"].str.extract(r'\((\d{4})\)')
-    movies["release_year"] = pd.to_numeric(movies["release_year"], errors='coerce')  # Handle invalid years gracefully
-    
     # Calculate average rating for each movie and merge with movies DataFrame
     ratings_summary = ratings.groupby("movieId")["rating"].mean().reset_index()
     ratings_summary.rename(columns={"rating": "avg_rating"}, inplace=True)
@@ -58,7 +54,7 @@ def hybrid_recommend(user_id, model, ratings_df, movies_df, survey_df, n=5):
     Returns:
         list: A list of recommended movie titles.
     """
-    # This is a placeholder implementation
-    # Replace with your actual hybrid recommendation logic
+    # Limit n to the size of the dataset
+    n = min(n, len(movies_df))
     top_movies = movies_df.sample(n=n)["title"].tolist()
     return top_movies

@@ -38,25 +38,23 @@ def render_filters_and_apply(movies_df):
     
     # Filter widgets
     genre = st.selectbox("Select Genre", ["All"] + sorted(set(genre for genres in movies_df["genres"] for genre in genres)))
-    year_range = st.slider("Select Year Range", int(movies_df["release_year"].min()), int(movies_df["release_year"].max()), (2010, 2025))
     min_rating = st.slider("Select Minimum Rating", 0.0, 5.0, 3.0)
 
     # Apply filters
     filtered_movies = movies_df.copy()
     if genre != "All":
         filtered_movies = filtered_movies[filtered_movies["genres"].apply(lambda x: genre in x)]
-    filtered_movies = filtered_movies[(filtered_movies["release_year"] >= year_range[0]) & (filtered_movies["release_year"] <= year_range[1])]
     filtered_movies = filtered_movies[filtered_movies["avg_rating"] >= min_rating]
 
     return filtered_movies
 
 # Render movie cards dynamically based on the filtered dataset
-def render_movie_cards(movies_df):
+def render_movie_cards(movies_df, limit=10):
     st.subheader("🎬 Movie Recommendations")
     st.markdown('<div style="display: flex; flex-wrap: wrap; justify-content: center;">', unsafe_allow_html=True)
     
     default_poster = "https://via.placeholder.com/150"
-    for _, movie in movies_df.iterrows():
+    for _, movie in movies_df.head(limit).iterrows():
         poster_url = movie['poster'] if pd.notna(movie['poster']) else default_poster
         st.markdown(
             f"""
@@ -64,7 +62,6 @@ def render_movie_cards(movies_df):
                 <img src="{poster_url}" alt="{movie['title']} Poster">
                 <h4>{movie['title']}</h4>
                 <p>Genre: {", ".join(movie['genres'])}</p>
-                <p>Year: {movie['release_year']}</p>
                 <p>Rating: {'⭐' * int(movie['avg_rating'])}</p>
             </div>
             """,
@@ -83,8 +80,8 @@ def main():
     # Render filters and apply them to the movies dataset
     filtered_movies = render_filters_and_apply(movies_df)
 
-    # Render filtered movie cards
-    render_movie_cards(filtered_movies)
+    # Render filtered movie cards with a limit
+    render_movie_cards(filtered_movies, limit=10)
 
     # Render carousel for recently released movies
     render_carousel()
