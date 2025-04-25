@@ -24,7 +24,8 @@ def load_data():
     assert os.path.exists(survey_path), f"File not found: {survey_path}"
     
     # Load datasets
-    movies = pd.read_csv(movies_path)
+    # movies = pd.read_csv(movies_path)
+    movies = pd.read_csv(movies_path, encoding='utf-8')
     ratings = pd.read_csv(ratings_path)
     survey_data = pd.read_csv(survey_path)
     
