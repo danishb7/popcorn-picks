@@ -46,7 +46,7 @@ def render_recommendations_list(recommendations):
     """
     Render recommendations in a vertical list view.
     """
-    st.subheader("🎥 Personalized Recommendations")
+    st.subheader("🎥 Recommendations for you!")
 
     default_poster = "https://via.placeholder.com/80x120"
     for movie in recommendations:
@@ -100,7 +100,7 @@ def render_movie_cards(movies_df, limit=10):
     st.markdown('</div>', unsafe_allow_html=True)
 
 def main():
-    st.title("🎬 Enhanced Movie Recommender App")
+    st.title("🎬 DB's Popcorn Picks!")
     add_custom_css()
 
     # Load data and model
