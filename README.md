@@ -85,12 +85,6 @@ Launch the Streamlit app:
 streamlit run app/app3.py
 ```
 
-### **5. Access the App**
-Open your browser and go to:
-```
-http://localhost:8501
-```
-
 ---
 
 ## **How It Works**
