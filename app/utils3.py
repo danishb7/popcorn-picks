@@ -29,7 +29,12 @@ def load_data():
     survey_data = pd.read_csv(survey_path)
     
     # Preprocess genres into lists
-    movies['genres'] = movies['genres'].str.split('|')
+    # movies['genres'] = movies['genres'].str.split('|')
+
+    if 'genres' in movies.columns:
+        movies['genres'] = movies['genres'].str.split('|')
+    else:
+        movies['genres'] = [[]] * len(movies)  # Set empty lists if 'genres' is missing
     
     # Calculate average rating for each movie and merge with movies DataFrame
     ratings_summary = ratings.groupby("movieId")["rating"].mean().reset_index()
