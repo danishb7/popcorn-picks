@@ -14,9 +14,9 @@ def load_data():
         survey_data (DataFrame): Survey data for hybrid recommendations.
     """
     # File paths
-    movies_path = "datasets/ml-25m/movies.csv"
-    ratings_path = "datasets/ml-25m/ratings.csv"
-    survey_path = "datasets/survey.csv"
+    movies_path = "./datasets/ml-25m/movies.csv"
+    ratings_path = "./datasets/ml-25m/ratings.csv"
+    survey_path = "./datasets/survey.csv"
     
     # Validate file existence
     assert os.path.exists(movies_path), f"File not found: {movies_path}"
