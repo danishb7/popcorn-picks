@@ -89,7 +89,7 @@ def main() -> None:
         display = popular[["title", "genres", "avg_rating", "rating_count"]].copy()
         display["genres"] = display["genres"].map(", ".join)
         display.columns = ["Movie", "Genres", "Community rating", "Ratings"]
-        st.dataframe(display, hide_index=True, use_container_width=True)
+        st.dataframe(display, hide_index=True)
 
 
 if __name__ == "__main__":
