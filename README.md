@@ -1,140 +1,222 @@
-# **Popcorn Picks: Personalized Movie Recommendation System**
+# Popcorn Picks
 
-Popcorn Picks is an interactive movie recommendation system designed to deliver personalized movie suggestions based on user preferences and historical ratings. This project combines collaborative filtering with content-based recommendations to create a hybrid recommendation engine. The system is powered by machine learning algorithms and features a user-friendly interface built with Streamlit.
+A movie recommendation project built with Python, MovieLens, Surprise SVD, and
+Streamlit. Train and evaluate a model from the command line, generate personalized
+recommendations, or explore the catalog in the web app. No notebooks are required.
 
----
+## Project structure
 
-## **Table of Contents**
-1. [Introduction](#introduction)
-2. [Features](#features)
-3. [Data Sources](#data-sources)
-4. [Technologies Used](#technologies-used)
-5. [Installation and Setup](#installation-and-setup)
-6. [How It Works](#how-it-works)
-7. [Usage](#usage)
-8. [Contributing](#contributing)
+```text
+popcorn-picks/
+├── app/
+│   └── app.py                # Streamlit interface
+├── src/popcorn_picks/
+│   ├── cli.py                # Train, recommend, and generate-survey commands
+│   ├── config.py             # Paths and survey column mapping
+│   ├── data.py               # CSV validation and preprocessing
+│   ├── model.py              # Model loading and atomic saving
+│   ├── recommender.py        # Hybrid ranking
+│   ├── survey.py             # Reproducible synthetic survey generation
+│   └── training.py           # SVD training and held-out evaluation
+├── tests/                    # Small fixtures; no 25M training run
+├── datasets/
+│   ├── ml-25m/               # Original CSVs and dataset documentation
+│   └── survey.csv            # Synthetic favorite-genre preferences
+├── model.pkl                 # Existing pretrained model (Git LFS)
+├── pyproject.toml            # Package, dependencies, CLI, and development tools
+├── requirements.txt          # Pinned runtime dependencies generated with pip-tools
+└── requirements-dev.txt      # Pinned runtime and development dependencies
+```
 
----
+## Setup
 
-## **Introduction**
-Popcorn Picks uses the MovieLens 25M dataset and additional survey data to create recommendations tailored to the user's preferences. The system incorporates collaborative filtering (using Singular Value Decomposition) and content-based filtering (using user-specific genre preferences) to suggest movies that the user is likely to enjoy.
+Use **Python 3.11 or 3.12**. Run these commands from the repository root.
+The CSVs and pretrained model use Git LFS; enable it before downloading the
+repository with [GitHub CLI](https://cli.github.com/).
 
----
-
-## **Features**
-- **Hybrid Recommendation Engine**:
-  Combines collaborative filtering and content-based filtering for accurate predictions.
-- **Interactive User Interface**:
-  Streamlit-based UI allows users to interact with the system using sliders, buttons, and dropdowns.
-- **Personalized Recommendations**:
-  Recommendations adapt based on user ratings and genre preferences.
-- **Efficient Data Handling**:
-  Handles large datasets efficiently while ensuring quick response times.
-- **Customizable Layouts**:
-  Movies are displayed in various formats, including grids, lists, and sliding windows.
-
----
-
-## **Data Sources**
-The following datasets are used in this project:
-1. **MovieLens 25M Dataset**:
-   - `movies.csv`: Contains movie titles and genres.
-   - `ratings.csv`: Contains user ratings for movies.
-   - Source: [MovieLens 25M Dataset](https://grouplens.org/datasets/movielens/25m/)
-
-2. **Survey Data**:
-   - A locally collected dataset (`survey.csv`) with anonymized user preferences for specific genres, including Action, Comedy, Sci-Fi, etc.
-
----
-
-## **Technologies Used**
-The project leverages the following technologies and libraries:
-- **Python**: Programming language.
-- **Pandas**: Data manipulation and preprocessing.
-- **NumPy**: Numerical computations.
-- **Surprise**: Recommendation system library for collaborative filtering.
-- **Streamlit**: Framework for building interactive web applications.
-- **Pickle**: For saving and loading the trained model.
-
----
-
-## **Installation and Setup**
-Follow these steps to set up and run the project locally:
-
-### **1. Clone the Repository**
 ```bash
-git clone https://github.com/danishb7/popcorn-picks.git
+git lfs install
+gh repo clone danishb7/popcorn-picks
 cd popcorn-picks
+python -m venv .venv
 ```
 
-### **2. Create a Virtual Environment**
+Activate the virtual environment:
+
+```powershell
+# Windows PowerShell
+.\.venv\Scripts\Activate.ps1
+```
+
 ```bash
-python3 -m venv venv
-source venv/bin/activate
+# macOS / Linux
+source .venv/bin/activate
 ```
 
-### **3. Install Dependencies**
-Install the required Python libraries using `pip`:
+Install the native build prerequisites first, then the package:
+
 ```bash
-pip install -r requirements.txt
+python -m pip install --upgrade pip
+python -m pip install "setuptools>=68" wheel "Cython>=3,<4" "numpy>=1.26,<2"
+python -m pip install --no-build-isolation -r requirements.txt -e .
 ```
 
-### **4. Run the Application**
-Launch the Streamlit app:
+Surprise 1.1.4 builds a native extension. A C/C++ compiler is required, such as
+Microsoft C++ Build Tools on Windows. The separate prerequisite step and
+`--no-build-isolation` ensure it builds against the NumPy version used at runtime.
+NumPy stays below version 2 for compatibility with the existing model. See the
+[Surprise installation documentation](https://pypi.org/project/scikit-surprise/1.1.4/).
+
+## Run the app
+
 ```bash
-streamlit run app/app3.py
+python -m streamlit run app/app.py
 ```
 
----
+Enter a MovieLens user ID, select a genre or minimum community rating, and choose
+**Find movies**. The app shows predicted ratings, hybrid scores, and real catalog
+genres and average ratings. Its browse tab lists the most rated movies.
 
-## **How It Works**
-1. **Data Preprocessing**:
-   - Genres are split into lists using delimiters.
-   - Users with less than 50 ratings are filtered out to ensure robust predictions.
-   - The `ratings.csv` and `movies.csv` datasets are merged to include genre information.
+The app and CLI share the same data and recommendation functions. The app caches
+the loaded resources; the full MovieLens dataset and pretrained model take time
+to load and require substantial memory.
 
-2. **Model Training**:
-   - The SVD model is trained using the Surprise library on a filtered subset of the ratings data.
-   - The model predicts user ratings for movies based on historical data and user preferences.
+## Train and evaluate
 
-3. **Recommendation Generation**:
-   - Collaborative filtering predictions are combined with genre-based scores for a hybrid recommendation approach.
-   - Final scores are calculated as 60% collaborative filtering and 40% content-based scores.
+Train a model without changing the supplied pretrained model:
 
-4. **User Interface**:
-   - Users interact with the app via sliders and buttons to get personalized recommendations.
+```bash
+popcorn-picks train --model-path artifacts/model.pkl
+```
 
----
+The pipeline validates the data, keeps users with at least 50 ratings, and
+evaluates SVD on a reproducible 80/20 split. It reports **RMSE** and **MAE**, then
+refits a fresh model on all retained ratings. Defaults match the original
+notebook: 100 factors, 20 epochs, and random seed 42.
 
-## **Usage**
-1. Launch the app by following the installation steps.
-2. Interact with the UI to input your preferences.
-3. View personalized movie recommendations in your preferred layout.
+The command saves `artifacts/model.pkl` and `artifacts/model.metrics.json`.
+For a quick run using the first 5,000 rating rows:
 
----
+```bash
+popcorn-picks train --max-rows 5000 --min-ratings 5 --n-factors 10 --n-epochs 2 --model-path artifacts/smoke-model.pkl
+```
 
-## **Contributing**
-Contributions are welcome! If you have ideas for improvement or want to add new features:
-1. Fork this repository.
-2. Create a new branch:
-   ```bash
-   git checkout -b feature-name
-   ```
-3. Make your changes and commit them:
-   ```bash
-   git commit -m "Add feature-name"
-   ```
-4. Push to the branch:
-   ```bash
-   git push origin feature-name
-   ```
-5. Submit a Pull Request.
+`--max-rows` takes the first rows, which are ordered by user in MovieLens. Use it
+for smoke checks, not representative model evaluation. Run
+`popcorn-picks train --help` for all options. With no `--model-path`, training
+replaces `model.pkl`.
 
----
+## Get recommendations from the CLI
 
-## **Acknowledgments**
-- [MovieLens 25M Dataset](https://grouplens.org/datasets/movielens/25m/)
-- [Surprise Library](https://surprise.readthedocs.io/)
-- [Streamlit Documentation](https://docs.streamlit.io/)
+```bash
+popcorn-picks recommend --user-id 1 --n 5
+popcorn-picks recommend --user-id 10000 --genre Action --min-average-rating 3.5
+popcorn-picks recommend --user-id 1 --model-path artifacts/model.pkl
+```
 
-Let us know if you have any questions or feedback about Popcorn Picks! Happy movie hunting! 🍿
+Every command also works as `python -m popcorn_picks`, for example:
+
+```bash
+python -m popcorn_picks recommend --user-id 1
+```
+
+The ranker excludes already-rated films and aligns predictions with catalog
+movie IDs. For users with survey preferences, the score is 60% predicted rating
+and 40% genre alignment. A favorite genre contributes 5/5; explicit
+`action_rating`, `comedy_rating`, and `sci_fi_rating` columns can instead provide
+0–5 weights. The strongest matching preference supplies the genre score, keeping
+it on the same scale as predictions. Users without survey preferences use the
+collaborative prediction alone. Average rating and genre filters apply before
+ranking; ties are resolved by movie ID.
+
+## Data and model paths
+
+Default paths point to `datasets/` and `model.pkl` in the source checkout,
+independent of the directory where the CLI runs. Use `--data-dir` and
+`--model-path` to override them. For the app or shared defaults, set:
+
+```powershell
+$env:POPCORN_PICKS_DATA_DIR = "C:\path\to\datasets"
+$env:POPCORN_PICKS_MODEL_PATH = "C:\path\to\artifacts\model.pkl"
+python -m streamlit run app/app.py
+```
+
+```bash
+POPCORN_PICKS_MODEL_PATH=artifacts/model.pkl python -m streamlit run app/app.py
+```
+
+Required files are `ml-25m/movies.csv` (`movieId,title,genres`) and
+`ml-25m/ratings.csv` (`userId,movieId,rating`; timestamps are ignored).
+`survey.csv` is optional. The supplied survey was generated synthetically and
+does not establish real-world identity correspondence with MovieLens users.
+Preferences are attached by `userId`, so meaningful preferences require matching
+IDs.
+
+Generate another repeatable demo survey without replacing the supplied file:
+
+```bash
+popcorn-picks generate-survey --users 50 --seed 42 --output artifacts/survey.csv
+```
+
+Only load trusted model files: Python pickle can execute code when loaded.
+The original model format remains supported; retrain if an old pickle is
+incompatible with your installed environment.
+
+## Development
+
+```bash
+python -m pip install --no-build-isolation -r requirements-dev.txt -e ".[dev]"
+python -m pytest
+python -m ruff check .
+python -m ruff format --check .
+```
+
+Tests use temporary CSVs and small SVD models to cover loading, filtering,
+ranking, evaluation, serialization, CLI commands, and Streamlit interactions.
+They do not retrain on the full MovieLens dataset or overwrite the supplied
+model. Generated models, reports, bytecode, and virtual environments are ignored.
+
+## Dependency security
+
+Runtime dependencies are declared in `pyproject.toml` and pinned, including
+transitive dependencies, in `requirements.txt`. Development tools are pinned in
+`requirements-dev.txt`. Streamlit requires **1.54.0 or
+later** and the lock file currently installs **1.65.0**. This excludes the versions
+affected by the reported Streamlit traversal, hashing, and Windows SSRF alerts.
+`scikit-learn` is not a dependency; the recommendation model uses
+`scikit-surprise` instead.
+
+Audit the pinned dependencies after installing the development extras:
+
+```bash
+python -m pip_audit -r requirements.txt --no-deps --disable-pip --strict
+python -m pip_audit -r requirements-dev.txt --no-deps --disable-pip --strict
+```
+
+The GitHub Actions security workflow runs this audit on pushes and pull requests.
+Dependabot checks Python dependencies and GitHub Actions for updates weekly.
+
+To update the lock file after editing `pyproject.toml` or adopting patched
+releases:
+
+```bash
+python -m piptools compile --upgrade --no-build-isolation --no-emit-index-url --no-emit-trusted-host --output-file=requirements.txt pyproject.toml
+python -m piptools compile --extra dev --strip-extras --upgrade --no-build-isolation --no-emit-index-url --no-emit-trusted-host --output-file=requirements-dev.txt pyproject.toml
+python -m pip_audit -r requirements.txt --no-deps --disable-pip --strict
+python -m pip_audit -r requirements-dev.txt --no-deps --disable-pip --strict
+python -m pip install --no-build-isolation -r requirements-dev.txt -e ".[dev]"
+python -m pytest
+```
+
+The audit checks known advisories and fails on vulnerability findings or
+incomplete package collection. Keep the local virtual environment isolated from
+system packages so unrelated, older installations do not enter the app environment.
+
+## Data sources
+
+- [MovieLens 25M](https://grouplens.org/datasets/movielens/25m/) from GroupLens.
+  Dataset terms and details are retained in `datasets/ml-25m/README.txt`.
+- The local synthetic survey is for demonstration only.
+
+Built with [Surprise](https://surprise.readthedocs.io/) and
+[Streamlit](https://docs.streamlit.io/).
