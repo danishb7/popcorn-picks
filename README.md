@@ -24,7 +24,8 @@ popcorn-picks/
 │   └── survey.csv            # Synthetic favorite-genre preferences
 ├── model.pkl                 # Existing pretrained model (Git LFS)
 ├── pyproject.toml            # Package, dependencies, CLI, and development tools
-└── requirements.txt          # Editable install of the package
+├── requirements.txt          # Pinned runtime dependencies generated with pip-tools
+└── requirements-dev.txt      # Pinned runtime and development dependencies
 ```
 
 ## Setup
@@ -57,7 +58,7 @@ Install the native build prerequisites first, then the package:
 ```bash
 python -m pip install --upgrade pip
 python -m pip install "setuptools>=68" wheel "Cython>=3,<4" "numpy>=1.26,<2"
-python -m pip install --no-build-isolation -r requirements.txt
+python -m pip install --no-build-isolation -r requirements.txt -e .
 ```
 
 Surprise 1.1.4 builds a native extension. A C/C++ compiler is required, such as
@@ -164,7 +165,7 @@ incompatible with your installed environment.
 ## Development
 
 ```bash
-python -m pip install --no-build-isolation -e ".[dev]"
+python -m pip install --no-build-isolation -r requirements-dev.txt -e ".[dev]"
 python -m pytest
 python -m ruff check .
 python -m ruff format --check .
@@ -174,6 +175,42 @@ Tests use temporary CSVs and small SVD models to cover loading, filtering,
 ranking, evaluation, serialization, CLI commands, and Streamlit interactions.
 They do not retrain on the full MovieLens dataset or overwrite the supplied
 model. Generated models, reports, bytecode, and virtual environments are ignored.
+
+## Dependency security
+
+Runtime dependencies are declared in `pyproject.toml` and pinned, including
+transitive dependencies, in `requirements.txt`. Development tools are pinned in
+`requirements-dev.txt`. Streamlit requires **1.54.0 or
+later** and the lock file currently installs **1.65.0**. This excludes the versions
+affected by the reported Streamlit traversal, hashing, and Windows SSRF alerts.
+`scikit-learn` is not a dependency; the recommendation model uses
+`scikit-surprise` instead.
+
+Audit the pinned dependencies after installing the development extras:
+
+```bash
+python -m pip_audit -r requirements.txt --no-deps --disable-pip --strict
+python -m pip_audit -r requirements-dev.txt --no-deps --disable-pip --strict
+```
+
+The GitHub Actions security workflow runs this audit on pushes and pull requests.
+Dependabot checks Python dependencies and GitHub Actions for updates weekly.
+
+To update the lock file after editing `pyproject.toml` or adopting patched
+releases:
+
+```bash
+python -m piptools compile --upgrade --no-build-isolation --no-emit-index-url --no-emit-trusted-host --output-file=requirements.txt pyproject.toml
+python -m piptools compile --extra dev --strip-extras --upgrade --no-build-isolation --no-emit-index-url --no-emit-trusted-host --output-file=requirements-dev.txt pyproject.toml
+python -m pip_audit -r requirements.txt --no-deps --disable-pip --strict
+python -m pip_audit -r requirements-dev.txt --no-deps --disable-pip --strict
+python -m pip install --no-build-isolation -r requirements-dev.txt -e ".[dev]"
+python -m pytest
+```
+
+The audit checks known advisories and fails on vulnerability findings or
+incomplete package collection. Keep the local virtual environment isolated from
+system packages so unrelated, older installations do not enter the app environment.
 
 ## Data sources
 
