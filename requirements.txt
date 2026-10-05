@@ -48,7 +48,7 @@ markupsafe==3.0.4
     # via jinja2
 narwhals==2.26.0
     # via altair
-numpy==1.26.4
+numpy==2.4.6
     # via
     #   pandas
     #   popcorn-picks (pyproject.toml)
@@ -60,7 +60,7 @@ packaging==26.3
     # via
     #   altair
     #   streamlit
-pandas==2.3.3
+pandas==3.0.6
     # via
     #   popcorn-picks (pyproject.toml)
     #   streamlit
@@ -88,7 +88,7 @@ rpds-py==2026.9.1
     # via
     #   jsonschema
     #   referencing
-scikit-surprise==1.1.4
+scikit-surprise==1.1.5
     # via popcorn-picks (pyproject.toml)
 scipy==1.17.1
     # via scikit-surprise
