@@ -9,9 +9,9 @@ description = "A hybrid MovieLens recommender with a training CLI and Streamlit 
 readme = "README.md"
 requires-python = ">=3.11,<3.13"
 dependencies = [
-    "numpy>=1.26,<2",
-    "pandas>=2.1,<3",
-    "scikit-surprise==1.1.4",
+    "numpy>=1.26,<3",
+    "pandas>=2.1,<4",
+    "scikit-surprise==1.1.5",
     "streamlit>=1.54,<2",
 ]
 
