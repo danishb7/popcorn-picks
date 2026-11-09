@@ -6,7 +6,7 @@
 #
 altair==6.3.0
     # via streamlit
-anyio==4.15.1
+anyio==4.16.0
     # via
     #   starlette
     #   streamlit
@@ -60,7 +60,7 @@ packaging==26.3
     # via
     #   altair
     #   streamlit
-pandas==3.1.0
+pandas==3.1.1
     # via
     #   popcorn-picks (pyproject.toml)
     #   streamlit
@@ -68,13 +68,13 @@ pillow==13.0.0
     # via streamlit
 protobuf==7.36.2
     # via streamlit
-pyarrow==26.0.0
+pyarrow==26.0.1
     # via streamlit
 pydeck==0.9.3
     # via streamlit
-python-dateutil==3.0.0
+python-dateutil==4.0.0
     # via pandas
-python-multipart==0.0.32
+python-multipart==0.0.33
     # via streamlit
 pytz==2026.6
     # via pandas
@@ -96,7 +96,7 @@ six==1.17.0
     # via python-dateutil
 starlette==1.10.0
     # via streamlit
-streamlit==1.66.1
+streamlit==1.67.0
     # via popcorn-picks (pyproject.toml)
 toml==0.10.2
     # via streamlit
@@ -113,7 +113,7 @@ urllib3==2.8.0
     # via requests
 uvicorn==0.54.0
     # via streamlit
-watchdog==6.0.0
+watchdog==7.1.0
     # via streamlit
 websockets==17.4
     # via streamlit
