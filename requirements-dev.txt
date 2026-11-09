@@ -6,7 +6,7 @@
 #
 altair==6.3.0
     # via streamlit
-anyio==4.15.1
+anyio==4.16.0
     # via
     #   starlette
     #   streamlit
@@ -41,7 +41,7 @@ cyclonedx-python-lib==11.12.0
     # via pip-audit
 defusedxml==0.7.1
     # via py-serializable
-filelock==4.2.4
+filelock==4.2.9
     # via cachecontrol
 h11==0.16.0
     # via uvicorn
@@ -96,7 +96,7 @@ packaging==26.3
     #   pytest
     #   streamlit
     #   wheel
-pandas==3.1.0
+pandas==3.1.1
     # via
     #   popcorn-picks (pyproject.toml)
     #   streamlit
@@ -110,15 +110,15 @@ pip-requirements-parser==32.0.1
     # via pip-audit
 pip-tools==7.6.2
     # via popcorn-picks (pyproject.toml)
-platformdirs==4.14.0
+platformdirs==4.14.5
     # via pip-audit
 pluggy==1.7.0
     # via pytest
 protobuf==7.36.2
     # via streamlit
-py-serializable==2.1.0
+py-serializable==2.2.0
     # via cyclonedx-python-lib
-pyarrow==26.0.0
+pyarrow==26.0.1
     # via streamlit
 pydeck==0.9.3
     # via streamlit
@@ -134,9 +134,9 @@ pyproject-hooks==1.3.3
     #   pip-tools
 pytest==9.2.0
     # via popcorn-picks (pyproject.toml)
-python-dateutil==3.0.0
+python-dateutil==4.0.0
     # via pandas
-python-multipart==0.0.32
+python-multipart==0.0.33
     # via streamlit
 pytz==2026.6
     # via pandas
@@ -155,7 +155,7 @@ rpds-py==2026.9.1
     # via
     #   jsonschema
     #   referencing
-ruff==0.17.3
+ruff==0.17.4
     # via popcorn-picks (pyproject.toml)
 scikit-surprise==1.1.5
     # via popcorn-picks (pyproject.toml)
@@ -167,7 +167,7 @@ sortedcontainers==2.4.0
     # via cyclonedx-python-lib
 starlette==1.10.0
     # via streamlit
-streamlit==1.66.1
+streamlit==1.67.0
     # via popcorn-picks (pyproject.toml)
 toml==0.10.2
     # via streamlit
@@ -189,7 +189,7 @@ urllib3==2.8.0
     # via requests
 uvicorn==0.54.0
     # via streamlit
-watchdog==6.0.0
+watchdog==7.1.0
     # via streamlit
 websockets==17.4
     # via streamlit
